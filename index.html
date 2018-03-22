@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>扁平化可伸展导航</title>
+		<!--<link rel="stylesheet" type="text/css" href="http://www.jq22.com/jquery/font-awesome.4.6.0.css">-->
+		<link rel="stylesheet" type="text/css" href="css/font-awesome.css">
+		<link rel="stylesheet" type="text/css" href="css/style.css">
+	</head>
+
+	<body>
+		<div class="navMenubox">
+			<div id="slimtest1">
+				<ul class="navMenu">
+				</ul>
+			</div>
+		</div>
+		<div id="togo"><span></span></div>
+		<!--<script src="http://www.jq22.com/jquery/jquery-1.10.2.js"></script>-->
+		<script src="js/jquery.min.js"></script>
+		<!--<script src="js/jquery.slimscroll.min.js"></script>-->
+		<script>
+			$(function() {
+				$.ajax({
+					url: 'JStree.json',
+					type: 'get',
+					data: {},
+					success: function(res) {
+						console.log(res)
+							//li.open打开 	a.active打开颜色  ul.sub-menu菜单  span.arrow左箭头  span.arrow.open下箭头 ul>li>a.arrow.open
+						for (var i = 0; i < res.length; i++) {
+							if (res[i].parent == '#') { //parent
+								var str1 = '<li class="open" data-id="' + res[i].id + '">' +
+									'<a href="javascript:;" class="active">' +
+									'<span class="icon_span"></span>&nbsp;&nbsp;' +
+									'<span>' + res[i].text + '</span>' +
+									'<span class="arrow open "></span>' +
+									'</a>' +
+									'</li>';
+								$('.navMenu').append(str1)
+							} else {
+								var str2 = '<li data-id="' + res[i].id + '">' +
+									' <a href="javascript:;">' +
+									'<span class="icon_span"><img src="' + res[i].icon + '" style="width:18px;height:18px;"/></span>' +
+									'<span>' + res[i].text + '</span>' +
+									'<span class=""></span>' +
+									'</a>' +
+									'</li>';
+								var parent_id = res[i].parent.trim()
+								var $parent_li = $('.navMenu li[data-id=' + parent_id + ']')
+								if ($parent_li.find('>ul').length == 0 ? 1 : 0) {
+									$parent_li.find('>a>span:eq(2)').addClass('arrow')
+									$parent_li.append('<ul class="sub-menu"><ul>')
+								}
+								$parent_li.find('>ul').append(str2)
+							}
+						}
+						// nav收缩展开
+						$('.navMenu li a').on('click', function() {
+							var parent = $(this).parent().parent(); //获取当前页签的父级的父级ul
+							var labeul = $(this).parent("li").find(">ul") //子级ul
+							if ($(this).parent().hasClass('open') == false) { //li是否有.open
+								//展开未展开
+								parent.find('ul').slideUp(300);
+								parent.find("li").removeClass("open")
+								parent.find('li a').removeClass("active").find(".arrow").removeClass("open")
+								$(this).parent("li").addClass("open").find(labeul).slideDown(300);
+								$(this).addClass("active").find(".arrow").addClass("open")
+							} else {
+								$(this).parent("li").removeClass("open").find(labeul).slideUp(300);
+								if ($(this).parent().find("ul").length > 0) {
+									$(this).removeClass("active").find(".arrow").removeClass("open")
+								} else {
+									$(this).addClass("active")
+								}
+							}
+						});
+						var togo_click = 0
+						$('#togo').click(function() {
+							if (togo_click == 0) {
+								$('.navMenubox,#togo').css({
+									'transform': 'translateX(-240px)',
+									'transition': '.6s'
+								})
+								$('#togo>span').css({
+									'transform': 'rotate(180deg)',
+									'transition': '.4s'
+								})
+								togo_click = 1
+							} else {
+								$('.navMenubox,#togo').css({
+									'transform': 'translateX(0px)',
+									'transition': '.6s'
+								})
+								$('#togo>span').css({
+									'transform': 'rotate(0deg)',
+									'transition': '.4s'
+								})
+								togo_click = 0
+							}
+						})
+					},
+					error: function(err) {
+						console.log(err)
+					}
+				})
+			});
+		</script>
+
+	</body>
+
+</html>
